@@ -1,2 +1,2 @@
 # issmoex
-A  package to interact with the MOEX ISS API
+Пакет нацелен на помощь с работой с ISS MOEX. 
