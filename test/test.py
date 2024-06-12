@@ -609,10 +609,10 @@ class ISSMOEX:
             df = df.drop_duplicates(ignore_index = True)
             return df
         else: 
-            if parameters is None:
+            if parameters is None or parameters is not list:
                 raise InvalidParametersError("Set up parameters to loop over in proper manner")
             else: 
-                coroutine = self.fetch_all_data(parameters=parameters, url_func=url, show_progress=show_progress, pages=pages,records_per_page = records_per_pages)
+                coroutine = self.fetch_all_data(parameters=parameters, url_func=url, show_progress=show_progress, pages=pages,records_per_page = records_per_page)
                 df_tables = self.run_fetcher(coroutine)
                 df_tables = pd.concat(df_tables, axis=0)
                 df_tables.columns = [i.split()[0] for i in df_tables.columns]
@@ -644,3 +644,13 @@ class ISSMOEX:
             print(engine)
             print(self.engines_markets[engine])
             raise InvalidMarketError(f"Invalid market: {market} for engine: {engine}. Please choose a correct market.")
+
+
+
+
+iss = ISSMOEX()
+
+x = iss.tables_description('stock','shares')
+x['marketdata']
+
+from issmoex import ISSMOEX
