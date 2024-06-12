@@ -14,3 +14,11 @@ Secondly, the downloading time reduction was achieved by using asynchronous fram
 
 **The example code, which demonstrates the package capabilities, placed here [here](https://github.com/alexandrettto/issmoex/blob/main/Example%20code.ipynb)**
 
+## Package installtion 
+
+The package can be installed using pip function: 
+
+```
+pip install issmoex
+```
+
