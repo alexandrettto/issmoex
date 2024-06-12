@@ -1,4 +1,4 @@
-<<<<<<< final
+
 # ISSMOEX package
 A package to interact with the [MOEX ISS API](https://iss.moex.com/iss/reference/). 
 
@@ -12,8 +12,5 @@ Firstly, most useful url requests are turned into functions with straight forwar
 Secondly, the downloading time reduction was achieved by using asynchronous framework. The download time has been improved by 9 times.
 
 
-The example code, which demonstrates the package capabilities, placed here [here](https://github.com/alexandrettto/issmoex/blob/main/Example%20code.ipynb)
-=======
-# issmoex
-Пакет нацелен на помощь с работой с ISS MOEX. 
->>>>>>> main
+**The example code, which demonstrates the package capabilities, placed here [here](https://github.com/alexandrettto/issmoex/blob/main/Example%20code.ipynb)**
+
