@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: ISSMOEX
+Version: 1.1.1.5
+Summary: A package to interact with the MOEX ISS API
+Home-page: https://github.com/yourusername/yourrepository
+Author: Illyuk Alexander
+Author-email: aaillyuk@gmail.com
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# issmoex
+A  package to interact with the MOEX ISS API
