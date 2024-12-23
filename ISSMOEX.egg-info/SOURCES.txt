@@ -1,7 +1,10 @@
 .DS_Store
 LICENSE
 README.md
+example.ipynb
 setup.py
+.ipynb_checkpoints/example-checkpoint.ipynb
+.vscode/settings.json
 ISSMOEX.egg-info/PKG-INFO
 ISSMOEX.egg-info/SOURCES.txt
 ISSMOEX.egg-info/dependency_links.txt
@@ -9,5 +12,7 @@ ISSMOEX.egg-info/requires.txt
 ISSMOEX.egg-info/top_level.txt
 issmoex/__init__.py
 issmoex/issmoex.py
+issmoex/__pycache__/__init__.cpython-310.pyc
+issmoex/__pycache__/issmoex.cpython-310.pyc
 test/__init__.py
 test/test.py

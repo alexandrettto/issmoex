@@ -5,7 +5,7 @@ import nest_asyncio
 import warnings
 from asyncio import Semaphore
 from tqdm.asyncio import tqdm
-
+from io import StringIO 
 
 class InvalidEngineError(Exception):
     """Exception raised when an invalid engine is provided."""
@@ -93,7 +93,7 @@ class ISSMOEX:
             Check if the provided engine and market are valid.
     """
     
-    def __init__(self, concurrent_n=10):
+    def __init__(self, concurrent_n=10, proxy = None):
         """
         Initializes the ISSas instance with the specified number of concurrent requests.
         
@@ -101,9 +101,13 @@ class ISSMOEX:
         ----------
         concurrent_n : int, optional
             Number of concurrent requests allowed (default is 10).
+        
+        proxy: None 
+            proxy of Internet connection
         """
         nest_asyncio.apply()
         self.concurrent_n = concurrent_n
+        self.proxy = proxy 
 
         url = 'https://iss.moex.com/iss/engines.html?iss.only=engines'
         
@@ -146,9 +150,14 @@ class ISSMOEX:
             async with self.semaphore:
                 try:
                     await asyncio.sleep(0.1 * (2 ** attempt))  # Exponential backoff starting with 0.1 seconds
-                    async with session.get(url) as response:
-                        response.raise_for_status()
-                        return await response.text()
+                    if self.proxy: 
+                        async with session.get(url, proxy = self.proxy) as response:
+                            response.raise_for_status()
+                            return await response.text()
+                    else: 
+                        async with session.get(url, proxy = self.proxy) as response:
+                            response.raise_for_status()
+                            return await response.text()            
                 except aiohttp.ClientError as e:
                     print(f"Failed to fetch {url}: {e}")
                     if attempt == retries - 1:
@@ -198,6 +207,7 @@ class ISSMOEX:
         self.semaphore = Semaphore(self.concurrent_n)
         if not pages:
             html_content = await self.fetch(session, base_url)
+            html_content = StringIO(html_content) if self.proxy else html_content
             if html_content:
                 return pd.read_html(html_content,encoding= 'utf-8')[0]
             return pd.DataFrame()
@@ -210,6 +220,7 @@ class ISSMOEX:
             for html_content in results:
                 if html_content is None:
                     continue
+                html_content = StringIO(html_content) if self.proxy else html_content
                 dfs = pd.read_html(html_content,encoding = 'utf-8')
                 if not dfs:
                     return pd.concat(dataframes, ignore_index=True) if dataframes else pd.DataFrame()
@@ -462,11 +473,12 @@ class ISSMOEX:
             A DataFrame containing the index components.
         """
         dates = [date] if isinstance(date, str) else date
-        url_func = lambda date: f'https://iss.moex.com/iss/statistics/engines/stock/markets/index/analytics/{index}.html?iss.only=analytics&date={date}limit=100'
+        url_func = lambda date: f'https://iss.moex.com/iss/statistics/engines/stock/markets/index/analytics/{index}.html?iss.only=analytics&date={date}&limit=100'
         coroutine = self.fetch_all_data(parameters=dates, url_func=url_func, show_progress=show_progress, pages=pages, records_per_page = 20)
         indx = self.run_fetcher(coroutine)
         indx = pd.concat(indx, axis=0)
         indx.columns = [i.split()[0] for i in indx.columns]
+        indx = indx.drop_duplicates()
         return indx 
     
     def history_prices(self, engine,market, isin, date, show_progress=False, main_board = True):
@@ -502,7 +514,43 @@ class ISSMOEX:
         indx = self.run_fetcher(coroutine)
         indx = pd.concat(indx)
         indx.columns = [i.split()[0] for i in indx.columns]
+        
         return indx
+    
+    def candles(self, engine,market, isin, date,interval = 1, show_progress=False):
+        """
+        Fetches historical candels for the given engine, ISIN, and date.
+        
+        Parameters:
+        ----------
+        engine : str
+            The engine from ISS.
+        market : str
+            The market of given engine from ISS.
+        isin : str or list of str
+            The ISIN or list of ISINs to fetch historical prices for.
+        date : str
+            The date to fetch historical prices from.
+        interval : int 
+            The timeframe of candel (default is 1 minute)
+        show_progress : bool, optional
+            Flag to indicate if progress should be shown (default is False).
+        Returns:
+        -------
+        pd.DataFrame
+            A DataFrame containing the historical prices.
+        """
+
+        self.engine_market_check(engine = engine,market = market)
+        isins = [isin] if isinstance(isin, str) else isin
+        url_func = lambda isin: f'https://iss.moex.com/iss/engines/{engine}/markets/{market}/securities/{isin}/candles.html?interval={interval}&from={date}'
+
+        coroutine = self.fetch_all_data(parameters=isins, url_func=url_func, show_progress=show_progress, pages=True, records_per_page=500)   
+        candles = self.run_fetcher(coroutine)
+        candles = pd.concat(candles)
+        candles.columns = [i.split()[0] for i in candles.columns]
+        
+        return candles    
     
 
     

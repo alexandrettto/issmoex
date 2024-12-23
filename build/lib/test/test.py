@@ -462,11 +462,12 @@ class ISSMOEX:
             A DataFrame containing the index components.
         """
         dates = [date] if isinstance(date, str) else date
-        url_func = lambda date: f'https://iss.moex.com/iss/statistics/engines/stock/markets/index/analytics/{index}.html?iss.only=analytics&date={date}limit=100'
+        url_func = lambda date: f'https://iss.moex.com/iss/statistics/engines/stock/markets/index/analytics/{index}.html?iss.only=analytics&date={date}&limit=100'
         coroutine = self.fetch_all_data(parameters=dates, url_func=url_func, show_progress=show_progress, pages=pages, records_per_page = 20)
         indx = self.run_fetcher(coroutine)
         indx = pd.concat(indx, axis=0)
         indx.columns = [i.split()[0] for i in indx.columns]
+        indx = indx.drop_duplicates()
         return indx 
     
     def history_prices(self, engine,market, isin, date, show_progress=False, main_board = True):
@@ -502,8 +503,8 @@ class ISSMOEX:
         indx = self.run_fetcher(coroutine)
         indx = pd.concat(indx)
         indx.columns = [i.split()[0] for i in indx.columns]
+        
         return indx
-    
 
     
     def markets(self,engine: str): 
@@ -609,10 +610,10 @@ class ISSMOEX:
             df = df.drop_duplicates(ignore_index = True)
             return df
         else: 
-            if parameters is None or parameters is not list:
+            if parameters is None:
                 raise InvalidParametersError("Set up parameters to loop over in proper manner")
             else: 
-                coroutine = self.fetch_all_data(parameters=parameters, url_func=url, show_progress=show_progress, pages=pages,records_per_page = records_per_page)
+                coroutine = self.fetch_all_data(parameters=parameters, url_func=url, show_progress=show_progress, pages=pages,records_per_page = records_per_pages)
                 df_tables = self.run_fetcher(coroutine)
                 df_tables = pd.concat(df_tables, axis=0)
                 df_tables.columns = [i.split()[0] for i in df_tables.columns]
@@ -644,13 +645,45 @@ class ISSMOEX:
             print(engine)
             print(self.engines_markets[engine])
             raise InvalidMarketError(f"Invalid market: {market} for engine: {engine}. Please choose a correct market.")
+    def candles(self, engine,market, isin, date,interval = 1, show_progress=False):
+        """
+        Fetches historical candels for the given engine, ISIN, and date.
+        
+        Parameters:
+        ----------
+        engine : str
+            The engine from ISS.
+        market : str
+            The market of given engine from ISS.
+        isin : str or list of str
+            The ISIN or list of ISINs to fetch historical prices for.
+        date : str
+            The date to fetch historical prices from.
+        interval : int 
+            The timeframe of candel (default is 1 minute)
+        show_progress : bool, optional
+            Flag to indicate if progress should be shown (default is False).
+        Returns:
+        -------
+        pd.DataFrame
+            A DataFrame containing the historical prices.
+        """
 
+        self.engine_market_check(engine = engine,market = market)
+        isins = [isin] if isinstance(isin, str) else isin
+        url_func = lambda isin: f'https://iss.moex.com/iss/engines/{engine}/markets/{market}/securities/{isin}/candles.html?interval={interval}&from={date}'
+
+        coroutine = self.fetch_all_data(parameters=isins, url_func=url_func, show_progress=show_progress, pages=True, records_per_page=500)   
+        candles = self.run_fetcher(coroutine)
+        candles = pd.concat(candles)
+        candles.columns = [i.split()[0] for i in candles.columns]
+        
+        return candles 
+    
 
 
 
 iss = ISSMOEX()
-
-x = iss.tables_description('stock','shares')
-x['marketdata']
+c = iss.candles('stock','shares','SBER','2024-05-20',show_progress=True)
 
 from issmoex import ISSMOEX
