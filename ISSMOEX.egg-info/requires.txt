@@ -3,4 +3,3 @@ aiohttp
 pandas
 nest_asyncio
 tqdm
-io

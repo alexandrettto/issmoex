@@ -2,6 +2,7 @@
 LICENSE
 README.md
 example.ipynb
+example.pdf
 setup.py
 .ipynb_checkpoints/example-checkpoint.ipynb
 .vscode/settings.json

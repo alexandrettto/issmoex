@@ -2,15 +2,14 @@ from setuptools import setup, find_packages
 
 setup(
     name='ISSMOEX',
-    version='1.1.1.9',
+    version='1.1.4',
     packages=find_packages(),
     install_requires=[
         'asyncio',
         'aiohttp',
         'pandas',
         'nest_asyncio',
-        'tqdm',
-        'io'
+        'tqdm'
     ],
     url='https://github.com/alexandrettto/issmoex',
     license='MIT',

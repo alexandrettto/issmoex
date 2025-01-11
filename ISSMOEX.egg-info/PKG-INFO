@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ISSMOEX
-Version: 1.1.1.9
+Version: 1.1.4
 Summary: A package to interact with the MOEX ISS API
 Home-page: https://github.com/alexandrettto/issmoex
 Author: Illyuk Alexander

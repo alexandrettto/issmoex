@@ -207,7 +207,7 @@ class ISSMOEX:
         self.semaphore = Semaphore(self.concurrent_n)
         if not pages:
             html_content = await self.fetch(session, base_url)
-            html_content = StringIO(html_content) if self.proxy else html_content
+            html_content = StringIO(html_content) 
             if html_content:
                 return pd.read_html(html_content,encoding= 'utf-8')[0]
             return pd.DataFrame()
@@ -220,7 +220,7 @@ class ISSMOEX:
             for html_content in results:
                 if html_content is None:
                     continue
-                html_content = StringIO(html_content) if self.proxy else html_content
+                html_content = StringIO(html_content) 
                 dfs = pd.read_html(html_content,encoding = 'utf-8')
                 if not dfs:
                     return pd.concat(dataframes, ignore_index=True) if dataframes else pd.DataFrame()
