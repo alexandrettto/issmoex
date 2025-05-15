@@ -181,7 +181,11 @@ class ISSMOEX:
         str or None
             The content of the response if successful, None otherwise.
         """
-        url = f"{base_url}&start={start}"
+        if base_url[-4:] == 'html':
+            url = f"{base_url}?start={start}"
+
+        else:
+            url = f"{base_url}&start={start}"
         return await self.fetch(session, url)
 
     async def fetch_all_pages(self, session, base_url, records_per_page, pages=True):
@@ -552,6 +556,36 @@ class ISSMOEX:
         
         return candles    
     
+    def trades(self, engine,market, isin, show_progress=False):
+        """
+        Fetches trades for the given engine, ISIN.
+        
+        Parameters:
+        ----------
+        engine : str
+            The engine from ISS.
+        market : str
+            The market of given engine from ISS.
+        isin : str or list of str
+            The ISIN or list of ISINs to fetch historical prices for.
+        show_progress : bool, optional
+            Flag to indicate if progress should be shown (default is False).
+        Returns:
+        -------
+        pd.DataFrame
+            A DataFrame containing the historical prices.
+        """
+
+        self.engine_market_check(engine = engine,market = market)
+        isins = [isin] if isinstance(isin, str) else isin
+        url_func = lambda isin: f'https://iss.moex.com/iss/engines/{engine}/markets/{market}/securities/{isin}/trades.html'
+
+        coroutine = self.fetch_all_data(parameters=isins, url_func=url_func, show_progress=show_progress, pages=True, records_per_page=500)   
+        trades = self.run_fetcher(coroutine)
+        trades = pd.concat(trades)
+        trades.columns = [i.split()[0] for i in trades.columns]
+        
+        return trades 
 
     
     def markets(self,engine: str): 
