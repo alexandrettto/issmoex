@@ -11,4 +11,4 @@ Firstly, most useful url requests are turned into functions with straight forwar
 Secondly, the downloading time reduction was achieved by using asynchronous framework. The download time has been improved by 9 times.
 
 
-The example code, which demonstrates the package capabilities, placed here [here](https://github.com/alexandrettto/issmoex/blob/main/Example%20code.ipynb)
+The example code, which demonstrates the package capabilities, placed [here](https://github.com/alexandrettto/issmoex/blob/main/Example%20code.ipynb)
